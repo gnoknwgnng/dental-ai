@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Dental Segmentation Viewer
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css">
+
+</head>
+
+<body>
+
+    <div class="page">
+
+        <!-- ===================================== -->
+        <!-- HEADER -->
+        <!-- ===================================== -->
+
+        <div class="header">
+
+            <h1>
+                Dental Segmentation Viewer
+            </h1>
+
+            <p>
+                Upload an image and visualize
+                segmentation results from
+                both models.
+            </p>
+
+        </div>
+
+        <!-- ===================================== -->
+        <!-- UPLOAD -->
+        <!-- ===================================== -->
+
+        <div class="upload-box">
+
+            <input
+                type="file"
+                id="imageInput"
+                accept="image/*">
+
+            <button
+                id="predictBtn">
+
+                Predict
+
+            </button>
+
+            <span
+                id="loadingText"
+                class="loading-text">
+
+                Processing...
+
+            </span>
+
+        </div>
+
+        <!-- ===================================== -->
+        <!-- MAIN -->
+        <!-- ===================================== -->
+
+        <div class="main-container">
+
+            <!-- ============================= -->
+            <!-- LEFT PANEL -->
+            <!-- ============================= -->
+
+            <div
+                id="classPanel"
+                class="class-panel">
+
+                <h2>
+                    Results
+                </h2>
+
+                <!-- Anatomy -->
+
+                <div
+                    class="group-section">
+
+                    <h3>
+                        Anatomical Structures
+                    </h3>
+
+                    <div
+                        id="anatomyClassList">
+
+                    </div>
+
+                </div>
+
+                <!-- Dental -->
+
+                <div
+                    class="group-section">
+
+                    <h3>
+                        Dental Findings
+                    </h3>
+
+                    <div
+                        id="dentalClassList">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ============================= -->
+            <!-- CANVAS -->
+            <!-- ============================= -->
+
+            <div
+                class="canvas-wrapper">
+
+                <div
+                    class="canvas-toolbar">
+
+                    <button
+                        id="showAllBtn">
+
+                        Show All
+
+                    </button>
+
+                    <button
+                        id="hideAllBtn">
+
+                        Hide All
+
+                    </button>
+
+                </div>
+
+                <div
+                    class="canvas-container">
+
+                    <canvas
+                        id="canvas">
+
+                    </canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="/static/app.js"></script>
+
+</body>
+
+</html>
