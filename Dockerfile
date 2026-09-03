@@ -18,8 +18,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application files
 COPY . .
 
-# Expose port
-EXPOSE 5000
+# Ensure uploads directory exists and has write permissions
+RUN mkdir -p uploads && chmod -R 777 /app
 
-# Run gunicorn server
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+# Hugging Face Spaces default port
+EXPOSE 7860
+
+# Run gunicorn server on port 7860
+CMD ["gunicorn", "--bind", "0.0.0.0:7860", "--workers", "2", "--timeout", "120", "app:app"]
