@@ -4,5 +4,4 @@ opencv-python-headless
 numpy
 Pillow
 gunicorn
-huggingface_hub<0.25.0
-gradio>=4.44.0,<5.0.0
+spaces

@@ -3,6 +3,15 @@ from ultralytics import YOLO
 import numpy as np
 import cv2
 import PIL.Image as Image
+import os
+
+try:
+    import spaces
+except ImportError:
+    class spaces:
+        @staticmethod
+        def GPU(func):
+            return func
 
 print("Loading models for Gradio...")
 anatomy_model = YOLO("models/anatomy_model.pt")
@@ -21,6 +30,7 @@ COLORS = [
     (188, 246, 12), (250, 190, 190), (0, 128, 128), (230, 190, 255)
 ]
 
+@spaces.GPU
 def predict_dental_xray(image):
     if image is None:
         return None, "Please upload an image."
@@ -29,8 +39,8 @@ def predict_dental_xray(image):
     if not isinstance(image, Image.Image):
         image = Image.fromarray(image)
 
-    # Temporary save for YOLO prediction
-    temp_path = "temp_input.jpg"
+    # Temporary save for YOLO prediction in /tmp
+    temp_path = "/tmp/temp_input.jpg"
     image.save(temp_path)
 
     # Run inference
@@ -72,6 +82,12 @@ def predict_dental_xray(image):
 
     summary_text = "\n".join(summary) if summary else "No detections found."
 
+    if os.path.exists(temp_path):
+        try:
+            os.remove(temp_path)
+        except Exception:
+            pass
+
     return overlay, summary_text
 
 # Define Gradio Interface
@@ -83,9 +99,8 @@ demo = gr.Interface(
         gr.Markdown(label="Detections Summary")
     ],
     title="🦷 Dental AI Segmentation Viewer",
-    description="Upload a panoramic dental X-ray to perform dual AI instance segmentation for anatomical structures and dental findings.",
-    examples=[]
+    description="Upload a panoramic dental X-ray to perform dual AI instance segmentation for anatomical structures and dental findings."
 )
 
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=7860)
+    demo.queue().launch()

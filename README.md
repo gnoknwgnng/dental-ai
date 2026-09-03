@@ -4,7 +4,6 @@ emoji: 🦷
 colorFrom: blue
 colorTo: indigo
 sdk: gradio
-sdk_version: 4.44.0
 app_file: gradio_app.py
 short_description: Deep learning dental X-ray instance segmentation.
 ---
@@ -17,4 +16,4 @@ A web application that analyzes panoramic dental X-ray images using dual PyTorch
 
 - **Dual-Model Inference**: Runs anatomical structure segmentation and dental findings segmentation in parallel.
 - **Visual Contours**: Polygons and labels rendered over detected anatomical landmarks and pathologies.
-- **Interactive Interface**: Powered by Gradio and PyTorch.
+- **Interactive Interface**: Powered by Gradio, ZeroGPU, and PyTorch.
