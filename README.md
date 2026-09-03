@@ -5,7 +5,7 @@ colorFrom: blue
 colorTo: indigo
 sdk: docker
 app_port: 7860
-short_description: Deep learning dental X-ray instance segmentation using YOLO models.
+short_description: Deep learning dental X-ray instance segmentation.
 ---
 
 # 🦷 Dental AI Segmentation Viewer
