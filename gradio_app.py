@@ -44,6 +44,11 @@ COLORS = [
     (170, 255, 195)  # Mint
 ]
 
+COLOR_EMOJIS = [
+    "🔴", "🟢", "🟡", "🔵", "🟠", "🟣", "🩵", "🩷",
+    "🟢", "🌸", "🔘", "💜", "🤎", "💛", "🍷", "🟢"
+]
+
 def normalize_name(name):
     return CLASS_ALIASES.get(name, name)
 
@@ -114,12 +119,13 @@ def predict_dental_xray(image):
     for idx, det in enumerate(final_detections, start=1):
         det["id"] = idx
         color = COLORS[(idx - 1) % len(COLORS)]
+        emoji = COLOR_EMOJIS[(idx - 1) % len(COLOR_EMOJIS)]
         det["color"] = color
 
         pts = np.array(det["polygon"], dtype=np.int32)
         
         # 1. Draw polygon boundary contour
-        cv2.polylines(overlay, [pts], isClosed=True, color=color, thickness=2)
+        cv2.polylines(overlay, [pts], isClosed=True, color=color, thickness=3)
 
         # 2. Draw semi-transparent polygon fill
         poly_mask = np.zeros((h, w), dtype=np.uint8)
@@ -127,44 +133,44 @@ def predict_dental_xray(image):
         for c in range(3):
             overlay[:, :, c] = np.where(
                 poly_mask == 255,
-                img_np[:, :, c] * 0.65 + color[c] * 0.35,
+                img_np[:, :, c] * 0.6 + color[c] * 0.4,
                 overlay[:, :, c]
             )
 
-        # 3. Draw numbered badge & class label directly on image
+        # 3. Draw bold numbered badge & class label directly on image
         cx, cy = int(det["cx"]), int(det["cy"])
 
         # Badge circle background (white)
-        cv2.circle(overlay, (cx, cy), 14, (255, 255, 255), -1)
+        cv2.circle(overlay, (cx, cy), 18, (255, 255, 255), -1)
         # Badge circle border (detection color)
-        cv2.circle(overlay, (cx, cy), 14, color, 2)
+        cv2.circle(overlay, (cx, cy), 18, color, 3)
         
         # Badge ID text inside circle
         id_text = str(idx)
-        text_size = cv2.getTextSize(id_text, cv2.FONT_HERSHEY_SIMPLEX, 0.45, 2)[0]
+        text_size = cv2.getTextSize(id_text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
         text_x = cx - text_size[0] // 2
         text_y = cy + text_size[1] // 2
-        cv2.putText(overlay, id_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2, cv2.LINE_AA)
+        cv2.putText(overlay, id_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2, cv2.LINE_AA)
 
         # Class Label Pill next to badge
         label = f" #{idx} {det['class_name']} ({det['confidence']:.0%})"
-        lbl_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1)[0]
-        lbl_x = cx + 18
-        lbl_y = cy + 5
+        lbl_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)[0]
+        lbl_x = cx + 22
+        lbl_y = cy + 6
 
         # Ensure label fits within image bounds
         if lbl_x + lbl_size[0] + 6 > w:
-            lbl_x = cx - 18 - lbl_size[0]
+            lbl_x = cx - 22 - lbl_size[0]
 
         # Label dark background box
-        cv2.rectangle(overlay, (lbl_x - 2, lbl_y - lbl_size[1] - 4), (lbl_x + lbl_size[0] + 4, lbl_y + 4), (15, 23, 42), -1)
+        cv2.rectangle(overlay, (lbl_x - 3, lbl_y - lbl_size[1] - 5), (lbl_x + lbl_size[0] + 5, lbl_y + 5), (15, 23, 42), -1)
         # Label colored border line
-        cv2.rectangle(overlay, (lbl_x - 2, lbl_y - lbl_size[1] - 4), (lbl_x + lbl_size[0] + 4, lbl_y + 4), color, 1)
+        cv2.rectangle(overlay, (lbl_x - 3, lbl_y - lbl_size[1] - 5), (lbl_x + lbl_size[0] + 4, lbl_y + 5), color, 2)
         # Label text
-        cv2.putText(overlay, label, (lbl_x, lbl_y), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(overlay, label, (lbl_x, lbl_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
 
         conf_pct = f"{det['confidence']:.1%}"
-        summary_rows.append(f"| **#{idx}** | **{det['class_name']}** | {det['source']} | `{conf_pct}` |")
+        summary_rows.append(f"| **#{idx}** {emoji} | **{det['class_name']}** | {det['source']} | `{conf_pct}` |")
 
     # Clean Markdown Table Summary & Legend
     if summary_rows:
@@ -190,11 +196,11 @@ demo = gr.Interface(
     fn=predict_dental_xray,
     inputs=gr.Image(type="pil", label="Upload Dental X-Ray Image"),
     outputs=[
-        gr.Image(type="numpy", label="Segmentation Output (Labeled with ID Badges)"),
+        gr.Image(type="numpy", label="Segmentation Output (Labeled with ID Badges #1, #2, #3...)"),
         gr.Markdown(label="Detections Legend & Summary")
     ],
     title="🦷 Dental AI Segmentation Viewer",
-    description="Upload a panoramic dental X-ray to perform dual AI instance segmentation for anatomical structures and dental findings. Each detected region is labeled with a numbered badge (#1, #2, #3...) matching the legend table below."
+    description="Upload a panoramic dental X-ray to perform dual AI instance segmentation for anatomical structures and dental findings. Each detected region is labeled with a bold numbered badge (#1, #2, #3...) matching the legend table below."
 )
 
 if __name__ == "__main__":
